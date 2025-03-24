@@ -13,17 +13,25 @@ var app = builder.Build();
 
 // Add middleware to the WebApplication to create a pipeline
 if (app.Environment.IsDevelopment()) {
+    app.UseDeveloperExceptionPage();
     app.UseHttpLogging();
 }
+else
+{
+    app.UseExceptionHandler("/error");
+}
 
-app.UseDeveloperExceptionPage();
-// app.UseWelcomePage();
+    app.UseWelcomePage("/");
 app.UseStaticFiles();
 app.UseRouting();
 
 // Map the endpoints to the WebApplication
-app.MapGet("/", () => "Hello World!");
+// You can define the endpoints for your app by using MapGet() anywhere in Program.cs before the call to app.Run(),
+// but the calls are typically placed after the middleware pipeline definition
+app.MapGet("/hello", () => "Hello World!");
 app.MapGet("/person", () => new Person("Huifeng", "Li"));
+app.MapGet("/error", () => "Sorry, an error occurred");
+app.MapGet("/throw", (HttpContext context) => throw new Exception("This is a test exception"));
 
 // Call Run() on the WebApplication to start the server and handle requests
 app.Run();
