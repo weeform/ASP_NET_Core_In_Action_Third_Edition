@@ -16,8 +16,10 @@ if (app.Environment.IsDevelopment()) {
     app.UseHttpLogging();
 }
 
+app.UseDeveloperExceptionPage();
 // app.UseWelcomePage();
 app.UseStaticFiles();
+app.UseRouting();
 
 // Map the endpoints to the WebApplication
 app.MapGet("/", () => "Hello World!");
