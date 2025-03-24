@@ -16,6 +16,9 @@ if (app.Environment.IsDevelopment()) {
     app.UseHttpLogging();
 }
 
+// app.UseWelcomePage();
+app.UseStaticFiles();
+
 // Map the endpoints to the WebApplication
 app.MapGet("/", () => "Hello World!");
 app.MapGet("/person", () => new Person("Huifeng", "Li"));
