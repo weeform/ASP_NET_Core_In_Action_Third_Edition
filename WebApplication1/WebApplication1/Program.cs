@@ -21,7 +21,7 @@ else
     app.UseExceptionHandler("/error");
 }
 
-    app.UseWelcomePage("/");
+app.UseWelcomePage("/welcome");
 app.UseStaticFiles();
 app.UseRouting();
 
@@ -38,6 +38,7 @@ var people = new List<Person> {
 app.MapGet("/person/{name}", (string name) => people.Where(p => p.FirstName.StartsWith(name)));
 app.MapGet("/error", (HttpContext context) => throw new Exception("exception when generate an exception page"));
 app.MapGet("/throw", (HttpContext context) => throw new Exception("This is a test exception"));
+app.MapFallback(() => Results.Redirect("/welcome"));
 
 // Call Run() on the WebApplication to start the server and handle requests
 app.Run();
