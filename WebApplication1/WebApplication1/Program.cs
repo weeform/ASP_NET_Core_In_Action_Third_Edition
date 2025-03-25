@@ -29,8 +29,14 @@ app.UseRouting();
 // You can define the endpoints for your app by using MapGet() anywhere in Program.cs before the call to app.Run(),
 // but the calls are typically placed after the middleware pipeline definition
 app.MapGet("/hello", () => "Hello World!");
-app.MapGet("/person", () => new Person("Huifeng", "Li"));
-app.MapGet("/error", () => "Sorry, an error occurred");
+
+var people = new List<Person> {
+    new("Huifeng", "Li"),
+    new("John", "Doe"),
+    new("A1", "Pacino")
+};
+app.MapGet("/person/{name}", (string name) => people.Where(p => p.FirstName.StartsWith(name)));
+app.MapGet("/error", (HttpContext context) => throw new Exception("exception when generate an exception page"));
 app.MapGet("/throw", (HttpContext context) => throw new Exception("This is a test exception"));
 
 // Call Run() on the WebApplication to start the server and handle requests
