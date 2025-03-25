@@ -11,19 +11,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Register the required services and configuration with the WebApplicationBuilder
 builder.Services.AddHttpLogging(opts => opts.LoggingFields = HttpLoggingFields.RequestProperties);
 builder.Logging.AddFilter("Microsoft.AspNetCore.HttpLogging", LogLevel.Information);
+builder.Services.AddProblemDetails();
 
 // Call Build() on the builder instance to create a WebApplication instance
 var app = builder.Build();
 
 // Add middleware to the WebApplication to create a pipeline
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();
-    app.UseHttpLogging();
-}
-else
-{
-    app.UseExceptionHandler("/error");
+    app.UseExceptionHandler();
 }
 
 app.UseWelcomePage("/welcome");
@@ -33,6 +29,7 @@ app.UseRouting();
 // Map the endpoints to the WebApplication
 // You can define the endpoints for your app by using MapGet() anywhere in Program.cs before the call to app.Run(),
 // but the calls are typically placed after the middleware pipeline definition
+app.MapGet("/", void () => throw new Exception());
 app.MapGet("/hello", () => "Hello World!");
 
 var people = new List<Person> {
@@ -41,7 +38,7 @@ var people = new List<Person> {
     new("A1", "Pacino")
 };
 app.MapGet("/person/{name}", (string name) => people.Where(p => p.FirstName.StartsWith(name)));
-app.MapGet("/error", (HttpContext context) => throw new Exception("exception when generate an exception page"));
+app.MapGet("/error", () => "Sorry, an error occurred");
 app.MapGet("/throw", (HttpContext context) => throw new Exception("This is a test exception"));
 app.MapFallback(() => Results.Redirect("/welcome"));
 
