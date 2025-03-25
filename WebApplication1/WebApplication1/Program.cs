@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.AspNetCore.Identity;
+using System.Net;
+
+ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
 
 // Create a WebAPplicationBuilder instance
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +14,8 @@ builder.Logging.AddFilter("Microsoft.AspNetCore.HttpLogging", LogLevel.Informati
 var app = builder.Build();
 
 // Add middleware to the WebApplication to create a pipeline
-if (app.Environment.IsDevelopment()) {
+if (app.Environment.IsDevelopment())
+{
     app.UseDeveloperExceptionPage();
     app.UseHttpLogging();
 }
@@ -40,7 +43,40 @@ app.MapGet("/error", (HttpContext context) => throw new Exception("exception whe
 app.MapGet("/throw", (HttpContext context) => throw new Exception("This is a test exception"));
 app.MapFallback(() => Results.Redirect("/welcome"));
 
+app.MapGet("/fruit", () => Fruit.All);
+var getFruit = (string id) => Fruit.All[id];
+app.MapGet("/fruit/{id}", getFruit);
+app.MapPost("/fruit/{id}", Handlers.AddFruit);
+
+Handlers handlers = new();
+app.MapPut("/fruit/{id}", handlers.ReplaceFruit);
+
+app.MapDelete("/fruit/{id}", DeleteFruit);
+
 // Call Run() on the WebApplication to start the server and handle requests
 app.Run();
+
+static void DeleteFruit(string id)
+{
+    Fruit.All.Remove(id);
+}
+
+record Fruit(string Name, int Stock)
+{
+    public static readonly Dictionary<string, Fruit> All = new();
+};
+
+class Handlers
+{
+    public void ReplaceFruit(string id, Fruit fruit)
+    {
+        Fruit.All[id] = fruit;
+    }
+
+    public static void AddFruit(string id, Fruit fruit)
+    {
+        Fruit.All.Add(id, fruit);
+    }
+}
 
 public record Person(string FirstName, string LastName);
