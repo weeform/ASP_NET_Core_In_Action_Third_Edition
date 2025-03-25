@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.HttpLogging;
 using System.Collections.Concurrent;
 using System.Net;
+using System.Net.Mime;
 
 ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
 
@@ -43,6 +44,12 @@ app.MapGet("/person/{name}", (string name) => people.Where(p => p.FirstName.Star
 app.MapGet("/error", (HttpContext context) => throw new Exception("exception when generate an exception page"));
 app.MapGet("/throw", (HttpContext context) => throw new Exception("This is a test exception"));
 app.MapFallback(() => Results.Redirect("/welcome"));
+
+app.MapGet("/teapot", (HttpResponse response) => {
+    response.StatusCode = 418;
+    response.ContentType = MediaTypeNames.Text.Plain;
+    return response.WriteAsync("I'm a teapot!");
+});
 
 var _fruit = new ConcurrentDictionary<string, Fruit>();
 app.MapGet("/fruit", () => _fruit);
