@@ -22,6 +22,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler();
 }
 
+app.UseStatusCodePages();
 app.UseWelcomePage("/welcome");
 app.UseStaticFiles();
 app.UseRouting();
@@ -40,7 +41,7 @@ var people = new List<Person> {
 app.MapGet("/person/{name}", (string name) => people.Where(p => p.FirstName.StartsWith(name)));
 app.MapGet("/error", () => "Sorry, an error occurred");
 app.MapGet("/throw", (HttpContext context) => throw new Exception("This is a test exception"));
-app.MapFallback(() => Results.Redirect("/welcome"));
+//app.MapFallback(() => Results.Redirect("/welcome"));
 
 app.MapGet("/teapot", (HttpResponse response) => {
     response.StatusCode = 418;
