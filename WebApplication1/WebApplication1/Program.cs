@@ -30,7 +30,7 @@ app.UseRouting();
 // Map the endpoints to the WebApplication
 // You can define the endpoints for your app by using MapGet() anywhere in Program.cs before the call to app.Run(),
 // but the calls are typically placed after the middleware pipeline definition
-app.MapGet("/", void () => throw new Exception());
+app.MapGet("/", () => Results.Redirect("/welcome"));
 app.MapGet("/hello", () => "Hello World!");
 
 var people = new List<Person> {
@@ -41,7 +41,7 @@ var people = new List<Person> {
 app.MapGet("/person/{name}", (string name) => people.Where(p => p.FirstName.StartsWith(name)));
 app.MapGet("/error", () => "Sorry, an error occurred");
 app.MapGet("/throw", (HttpContext context) => throw new Exception("This is a test exception"));
-//app.MapFallback(() => Results.Redirect("/welcome"));
+app.MapFallback(() => Results.Redirect("/welcome"));
 
 app.MapGet("/teapot", (HttpResponse response) => {
     response.StatusCode = 418;
@@ -51,9 +51,19 @@ app.MapGet("/teapot", (HttpResponse response) => {
 
 var _fruit = new ConcurrentDictionary<string, Fruit>();
 app.MapGet("/fruit", () => _fruit);
-app.MapGet("/fruit/{id}", (string id) => _fruit.TryGetValue(id, out var fruit)
-    ? Results.Ok(fruit)
-    : Results.Problem(statusCode: 404));
+app.MapGet("/fruit/{id}", (string id) =>
+{
+    if (string.IsNullOrEmpty(id) || !id.StartsWith('f'))
+    {
+        return Results.ValidationProblem(new Dictionary<string, string[]>
+        {
+            { "id", new[] { "Invalid format. Id must start with 'f'"} }
+        });
+    }
+    return _fruit.TryGetValue(id, out var fruit)
+        ? Results.Ok(fruit)
+        : Results.Problem(statusCode: 404);
+});
 
 app.MapPost("/fruit/{id}", (string id, Fruit fruit) => _fruit.TryAdd(id, fruit)
     ? TypedResults.Created($"/fruit/{id}", fruit)
