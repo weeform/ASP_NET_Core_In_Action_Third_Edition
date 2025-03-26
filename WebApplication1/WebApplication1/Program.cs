@@ -96,6 +96,9 @@ class ValidationHelper
         EndpointFilterInvocationContext context,
         EndpointFilterDelegate next)
     {
+        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<ValidationHelper>>();
+        logger.LogInformation("Executing ValidateId method");
+
         var id = context.GetArgument<string>(0);
         if (string.IsNullOrEmpty(id) || !id.StartsWith('f'))
         {
