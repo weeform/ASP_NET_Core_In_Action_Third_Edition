@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.HttpLogging;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Mime;
+using System.Reflection;
 
 ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
 
@@ -54,20 +55,14 @@ app.MapGet("/fruit", () => _fruit);
 app.MapGet("/fruit/{id}", (string id) => _fruit.TryGetValue(id, out var fruit)
         ? Results.Ok(fruit)
         : Results.Problem(statusCode: 404))
-    .AddEndpointFilter(ValidationHelper.ValidateId)
-    .AddEndpointFilter(async (context, next) =>
-    {
-        app.Logger.LogInformation("Executing filter...");
-        object? result = await next(context);
-        app.Logger.LogInformation($"Handler result: {result}");
-        return result;
-    });
+    .AddEndpointFilterFactory(ValidationHelper.ValidateIdFactory);
 
 app.MapPost("/fruit/{id}", (string id, Fruit fruit) => _fruit.TryAdd(id, fruit)
     ? TypedResults.Created($"/fruit/{id}", fruit)
     : Results.ValidationProblem(new Dictionary<string, string[]> {
         { "id", new [] {"A fruit with this id already exists"} }
-    }));
+    }))
+    .AddEndpointFilterFactory(ValidationHelper.ValidateIdFactory); ;
 
 app.MapPut("/fruit/{id}", (string id, Fruit fruit) => {
     _fruit[id] = fruit;
@@ -92,6 +87,38 @@ public record Person(string FirstName, string LastName);
 
 class ValidationHelper
 {
+    internal static EndpointFilterDelegate ValidateIdFactory(
+        EndpointFilterFactoryContext context,
+        EndpointFilterDelegate next)
+    {
+        ParameterInfo[] parameters = context.MethodInfo.GetParameters();
+        int? idPostion = null;
+        for (int i = 0; i < parameters.Length; i++) {
+            if (parameters[i].Name == "id" && parameters[i].ParameterType == typeof(string))
+            {
+                idPostion = i;
+                break;
+            }
+        }
+        if (!idPostion.HasValue)
+        {
+            return next;
+        }
+        return async (invocationContext) =>
+        {
+            var id = invocationContext.GetArgument<string>(idPostion.Value);
+            if (string.IsNullOrEmpty(id) || !id.StartsWith('f'))
+            {
+                return Results.ValidationProblem(
+                    new Dictionary<string, string[]> {
+                        {"id", new[] { "Invalid format. Id must start with 'f'"} }
+                    });
+            }
+            return await next(invocationContext);
+        };
+    }
+
+
     internal static async ValueTask<object?> ValidateId(
         EndpointFilterInvocationContext context,
         EndpointFilterDelegate next)
