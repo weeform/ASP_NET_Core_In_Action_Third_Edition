@@ -54,7 +54,14 @@ app.MapGet("/fruit", () => _fruit);
 app.MapGet("/fruit/{id}", (string id) => _fruit.TryGetValue(id, out var fruit)
         ? Results.Ok(fruit)
         : Results.Problem(statusCode: 404))
-    .AddEndpointFilter(ValidationHelper.ValidateId);
+    .AddEndpointFilter(ValidationHelper.ValidateId)
+    .AddEndpointFilter(async (context, next) =>
+    {
+        app.Logger.LogInformation("Executing filter...");
+        object? result = await next(context);
+        app.Logger.LogInformation($"Handler result: {result}");
+        return result;
+    });
 
 app.MapPost("/fruit/{id}", (string id, Fruit fruit) => _fruit.TryAdd(id, fruit)
     ? TypedResults.Created($"/fruit/{id}", fruit)
