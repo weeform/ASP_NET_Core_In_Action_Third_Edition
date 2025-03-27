@@ -55,7 +55,7 @@ app.MapGet("/fruit", () => _fruit);
 app.MapGet("/fruit/{id}", (string id) => _fruit.TryGetValue(id, out var fruit)
         ? Results.Ok(fruit)
         : Results.Problem(statusCode: 404))
-    .AddEndpointFilterFactory(ValidationHelper.ValidateIdFactory);
+    .AddEndpointFilter<IdValidationFilter>();
 
 app.MapPost("/fruit/{id}", (string id, Fruit fruit) => _fruit.TryAdd(id, fruit)
     ? TypedResults.Created($"/fruit/{id}", fruit)
@@ -132,6 +132,24 @@ class ValidationHelper
             return Results.ValidationProblem(
                 new Dictionary<string, string[]> {
                     {"id", new[] { "Invalid format. Id must start with 'f'"} }
+                });
+        }
+        return await next(context);
+    }
+}
+
+class IdValidationFilter : IEndpointFilter
+{
+    public async ValueTask<object?> InvokeAsync(
+        EndpointFilterInvocationContext context,
+        EndpointFilterDelegate next)
+    {
+        var id = context.GetArgument<string>(0);
+        if (string.IsNullOrEmpty(id) || !id.StartsWith('f'))
+        {
+            return Results.ValidationProblem(
+                new Dictionary<string, string[]> {
+                    {"id", new[]{ "Invalid format. Id must start with 'f'"} }
                 });
         }
         return await next(context);
