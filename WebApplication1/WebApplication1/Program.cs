@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.HttpLogging;
+﻿using Microsoft.AspNetCore.HttpLogging;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Mime;
@@ -51,25 +51,35 @@ app.MapGet("/teapot", (HttpResponse response) => {
 });
 
 var _fruit = new ConcurrentDictionary<string, Fruit>();
-app.MapGet("/fruit", () => _fruit);
-app.MapGet("/fruit/{id}", (string id) => _fruit.TryGetValue(id, out var fruit)
-        ? Results.Ok(fruit)
-        : Results.Problem(statusCode: 404))
-    .AddEndpointFilter<IdValidationFilter>();
+RouteGroupBuilder fruitApi = app.MapGroup("/fruit");
 
-app.MapPost("/fruit/{id}", (string id, Fruit fruit) => _fruit.TryAdd(id, fruit)
+fruitApi.MapGet("/", () => _fruit);
+
+RouteGroupBuilder fruitApiWithValidation = fruitApi.MapGroup("/")
+    .AddEndpointFilterFactory(ValidationHelper.ValidateIdFactory);
+
+fruitApiWithValidation.MapGet("/{id}", (string id) =>
+    _fruit.TryGetValue(id, out var fruit)
+    ? TypedResults.Ok(fruit)
+    : Results.Problem(statusCode: 404));
+
+fruitApiWithValidation.MapPost("/{id}", (Fruit fruit, string id) =>
+    _fruit.TryAdd(id, fruit)
     ? TypedResults.Created($"/fruit/{id}", fruit)
-    : Results.ValidationProblem(new Dictionary<string, string[]> {
-        { "id", new [] {"A fruit with this id already exists"} }
-    }))
-    .AddEndpointFilterFactory(ValidationHelper.ValidateIdFactory); ;
+    : Results.ValidationProblem(
+        new Dictionary<string, string[]>
+        {
+            {"id", new[] { "A fruit with this id already exists"} }
+        }
+));
 
-app.MapPut("/fruit/{id}", (string id, Fruit fruit) => {
+fruitApiWithValidation.MapPut("/{id}", (string id, Fruit fruit) =>
+{
     _fruit[id] = fruit;
     return Results.NoContent();
 });
 
-app.MapDelete("/fruit/{id}", (string id) =>
+fruitApiWithValidation.MapDelete("/{id}", (string id) =>
 {
     _fruit.TryRemove(id, out _);
     return Results.NoContent();
