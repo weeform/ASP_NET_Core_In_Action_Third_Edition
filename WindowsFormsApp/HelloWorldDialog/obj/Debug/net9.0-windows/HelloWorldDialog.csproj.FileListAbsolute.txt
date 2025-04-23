@@ -1,0 +1,15 @@
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\bin\Debug\net9.0-windows\HelloWorldDialog.exe
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\bin\Debug\net9.0-windows\HelloWorldDialog.deps.json
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\bin\Debug\net9.0-windows\HelloWorldDialog.runtimeconfig.json
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\bin\Debug\net9.0-windows\HelloWorldDialog.dll
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\bin\Debug\net9.0-windows\HelloWorldDialog.pdb
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\HelloWorldDialog.GeneratedMSBuildEditorConfig.editorconfig
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\HelloWorldDialog.AssemblyInfoInputs.cache
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\HelloWorldDialog.AssemblyInfo.cs
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\HelloWorldDialog.csproj.CoreCompileInputs.cache
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\HelloWorldDialog.sourcelink.json
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\HelloWorldDialog.dll
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\refint\HelloWorldDialog.dll
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\HelloWorldDialog.pdb
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\HelloWorldDialog.genruntimeconfig.cache
+D:\Github\ASP_NET_Core_In_Action_Third_Edition\WindowsFormsApp\HelloWorldDialog\obj\Debug\net9.0-windows\ref\HelloWorldDialog.dll
